@@ -1,5 +1,5 @@
 [vm_host_1]
-STR-ACS-SERV-01 ansible_host=10.251.0.245
+STR-ACS-SERV-01 ansible_host=10.250.0.1
 
 [vm_host_2]
 STR-ACS-SERV-02 ansible_host=10.251.0.192

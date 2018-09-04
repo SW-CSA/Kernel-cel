@@ -32,17 +32,23 @@ cel-seastone-02    ansible_host=10.250.0.100  hwsku="Seastone-DX010"
 iface_speed='100000'
 mgmt_subnet_mask_length="24"
 
-
+[sonic_e1031]
+cel-e1031-01    ansible_host=10.250.0.100  hwsku="Celestica-E1031-T48S4"
+ 
+[sonic_e1031:vars]
+iface_speed='1000'
+mgmt_subnet_mask_length="24"
 [sonic:children]
 sonic_sn2700_40
 sonic_s6000
 sonic_s6100
 sonic_a7260
 sonic_slx02
+sonic_e1031
 
 
 [ptf]
-ptf_ptf1    ansible_host=10.255.0.188 ansible_ssh_user=root ansible_ssh_pass=root
+ptf_ptf1    ansible_host=10.250.0.110 ansible_ssh_user=root ansible_ssh_pass=root
 ptf_vms1-1  ansible_host=10.255.0.178 ansible_ssh_user=root ansible_ssh_pass=root
 
 [lab:children]

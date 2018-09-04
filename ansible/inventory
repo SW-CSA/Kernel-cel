@@ -5,6 +5,7 @@ switch3  ansible_host=10.0.0.102  sonic_version=v2  sonic_hwsku=Force10-S6000   
 switch4  ansible_host=10.0.0.103  sonic_version=v2  sonic_hwsku=AS7512 sonic_portsku=32x40
 switch5  ansible_host=10.0.0.104  sonic_version=v2  sonic_hwsku=ACS-MSN2700 # LAG topo: 8 LAGs x 2 members/lag to spines; 16 ports to Tors
 cel-seastone-02  ansible_host=10.250.0.100  sonic_version=v2  sonic_hwsku=Seastone-DX010
+cel-e1031-01  ansible_host=10.250.0.100  sonic_version=v2  sonic_hwsku=Celestica-E1031-T48S4
 
 [sonic:children]
 sonic_latest
@@ -13,6 +14,7 @@ sonic_latest
 switch1
 switch5
 cel-seastone-02
+cel-e1031-01
 
 [ptf]
-ptf-1 ansible_host=10.0.0.200 ansible_ssh_user=root ansible_ssh_pass=password
+ptf-1 ansible_host=10.250.0.110 ansible_ssh_user=root ansible_ssh_pass=password
