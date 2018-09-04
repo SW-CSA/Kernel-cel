@@ -19,9 +19,11 @@
 - set_fact:
     peer_device: "{{ fanout_neighbors[flap_intf]['peerdevice'] }}"
     neighbor_interface: "{{ fanout_neighbors[flap_intf]['peerport'] }}"
+  ignore_errors: yes #bbx ignore fanout
 
 - conn_graph_facts: host={{ peer_device }}
   connection: local
+  ignore_errors: yes #bbx ignore fanout
 
 ### Now figure out remote VM and interface info for the falpping lag member and run minlink test
 - set_fact:

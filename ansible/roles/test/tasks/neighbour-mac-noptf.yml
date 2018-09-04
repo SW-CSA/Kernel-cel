@@ -155,9 +155,10 @@
   become: yes
 
   always:
-    - name: reset all changes
-      shell: "config load_minigraph -y"
-      become: yes
+################ remove it because It was unstable to reboot sonic  #############################
+#    - name: reset all changes
+#      shell: "config load_minigraph -y"
+#      become: yes
 
     - name: wait 60 seconds for ports to be up
       pause: seconds=60
