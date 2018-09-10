@@ -15,4 +15,4 @@ switch5
 cel-seastone-02
 
 [ptf]
-ptf-1 ansible_host=10.0.0.200 ansible_ssh_user=root ansible_ssh_pass=password
+ptf-1 ansible_host=10.250.0.110 ansible_ssh_user=root ansible_ssh_pass=password
