@@ -1,8 +1,4 @@
 StartDevice,StartPort,EndDevice,EndPort,BandWidth,VlanID,VlanMode
-cel_seastone_01,  Ethernet0,seastone-01,  Ethernet0,100000,100,Access
-cel_seastone_01,  Ethernet4,seastone-01,  Ethernet4,100000,101,Access
-cel_seastone_01,  Ethernet8,seastone-01,  Ethernet8,100000,102,Access
-cel_seastone_01, Ethernet12,seastone-01, Ethernet12,100000,103,Access
 cel_seastone_01, Ethernet16,seastone-01, Ethernet16,100000,104,Access
 cel_seastone_01, Ethernet20,seastone-01, Ethernet20,100000,105,Access
 cel_seastone_01, Ethernet24,seastone-01, Ethernet24,100000,106,Access
