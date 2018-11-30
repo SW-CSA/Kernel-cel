@@ -82,4 +82,4 @@ sleep 60
 rm -rf /tmp/testacl.json
 
 # IMPORTANT! Restore original service ACLs, so that we restore SSH connectivity
-acl-loader update full /etc/sonic/acl.json
+acl-loader delete
