@@ -60,7 +60,7 @@
     vm_name: "{{ item }}"
     hostname: "{{ vm_name }}"
     mgmt_ip_address: "{{ hostvars[vm_name]['ansible_host'] }}"
-    serial_port: "{{ vm_console_base|int + vm_name[4:]|int }}"
+    serial_port: "{{ vm_console_base|int + vm_name[3:]|int }}"    # modified by Vincent Meng, from vm_name[4:]
     disk_image: "{{ root_path }}/disks/{{ vm_name }}_hdd.vmdk"
     mgmt_tap:  "{{ vm_name }}-m"
     port1_bridge: "br-{{ vm_name }}-back"
