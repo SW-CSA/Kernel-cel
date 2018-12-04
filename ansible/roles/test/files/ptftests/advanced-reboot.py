@@ -1,10 +1,10 @@
 #
-#ptf --test-dir ptftests fast-reboot --qlen=1000 --platform remote -t 'verbose=True;dut_username="admin";dut_hostname="10.0.0.243";fast_reboot_limit=30;portchannel_ports_file="/tmp/portchannel_interfaces.json";vlan_ports_file="/tmp/vlan_interfaces.json";ports_file="/tmp/ports.json";dut_mac="4c:76:25:f5:48:80";default_ip_range="192.168.0.0/16";vlan_ip_range="172.0.0.0/22";arista_vms="[\"10.0.0.200\",\"10.0.0.201\",\"10.0.0.202\",\"10.0.0.203\"]"' --platform-dir ptftests --disable-vxlan --disable-geneve --disable-erspan --disable-mpls --disable-nvgre
+#ptf --test-dir ptftests fast-reboot --qlen=1000 --platform remote -t 'verbose=True;dut_username="admin";dut_hostname="10.0.0.243";reboot_limit_in_seconds=30;portchannel_ports_file="/tmp/portchannel_interfaces.json";vlan_ports_file="/tmp/vlan_interfaces.json";ports_file="/tmp/ports.json";dut_mac="4c:76:25:f5:48:80";default_ip_range="192.168.0.0/16";vlan_ip_range="172.0.0.0/22";arista_vms="[\"10.0.0.200\",\"10.0.0.201\",\"10.0.0.202\",\"10.0.0.203\"]"' --platform-dir ptftests --disable-vxlan --disable-geneve --disable-erspan --disable-mpls --disable-nvgre
 #
 #
 # This test checks that DUT is able to make FastReboot procedure
 #
-# This test supposes that fast-reboot initiates by running /usr/bin/fast-reboot command.
+# This test supposes that fast-reboot/warm-reboot initiates by running /usr/bin/{fast,warm}-reboot command.
 #
 # The test uses "pings". The "pings" are packets which are sent through dataplane in two directions
 # 1. From one of vlan interfaces to T1 device. The source ip, source interface, and destination IP are chosen randomly from valid choices. Number of packet is 100.
@@ -14,12 +14,12 @@
 # The test sequence is following:
 # 1. Check that DUT is stable. That means that "pings" work in both directions: from T1 to servers and from servers to T1.
 # 2. If DUT is stable the test starts continiously pinging DUT in both directions.
-# 3. The test runs '/usr/bin/fast-reboot' on DUT remotely. The ssh key supposed to be uploaded by ansible before the test
+# 3. The test runs '/usr/bin/{fast,warm}-reboot' on DUT remotely. The ssh key supposed to be uploaded by ansible before the test
 # 4. As soon as it sees that ping starts failuring in one of directions the test registers a start of dataplace disruption
 # 5. As soon as the test sees that pings start working for DUT in both directions it registers a stop of dataplane disruption
 # 6. If the length of the disruption is less than 30 seconds (if not redefined by parameter) - the test passes
 # 7. If there're any drops, when control plane is down - the test fails
-# 8. When test start fast-reboot procedure it connects to all VM (which emulates T1) and starts fetching status of BGP and LACP
+# 8. When test start reboot procedure it connects to all VM (which emulates T1) and starts fetching status of BGP and LACP
 #    LACP is supposed to be down for one time only, if not - the test fails
 #    if default value of BGP graceful restart timeout is less than 120 seconds the test fails
 #    if BGP graceful restart is not enabled on DUT the test fails
@@ -354,7 +354,7 @@ class Arista(object):
 
         return is_down_count, sum(res[False]) # summary_downtime
 
-class FastReloadTest(BaseTest):
+class ReloadTest(BaseTest):
     TIMEOUT = 0.5
     def __init__(self):
         BaseTest.__init__(self)
@@ -362,17 +362,19 @@ class FastReloadTest(BaseTest):
         self.info = {}
         self.cli_info = {}
         self.logs_info = {}
-        self.log_fp = open('/tmp/fast-reboot.log', 'w')
+        self.log_fp = open('/tmp/reboot.log', 'w')
         self.test_params = testutils.test_params_get()
         self.check_param('verbose', False,   required = False)
         self.check_param('dut_username', '', required = True)
         self.check_param('dut_hostname', '', required = True)
-        self.check_param('fast_reboot_limit', 30, required = False)
+        self.check_param('reboot_limit_in_seconds', 30, required = False)
+        self.check_param('reboot_type', 'fast-reboot', required = False)
         self.check_param('graceful_limit', 120, required = False)
         self.check_param('portchannel_ports_file', '', required = True)
         self.check_param('vlan_ports_file', '', required = True)
         self.check_param('ports_file', '', required = True)
         self.check_param('dut_mac', '', required = True)
+        self.check_param('dut_vlan_ip', '', required = True)
         self.check_param('default_ip_range', '', required = True)
         self.check_param('vlan_ip_range', '', required = True)
         self.check_param('lo_prefix', '10.1.0.32/32', required = False)
@@ -381,6 +383,7 @@ class FastReloadTest(BaseTest):
         self.check_param('min_bgp_gr_timeout', 15, required = False)
 
         # Default settings
+        self.ping_dut_pkts = 10
         self.nr_pc_pkts = 100
         self.nr_tests = 3
         self.reboot_delay = 10
@@ -472,16 +475,20 @@ class FastReloadTest(BaseTest):
         vlan_ip_range = self.test_params['vlan_ip_range']
         self.vlan_ports = self.read_vlan_ports()
 
-        self.limit = datetime.timedelta(seconds=self.test_params['fast_reboot_limit'])
+        self.limit = datetime.timedelta(seconds=self.test_params['reboot_limit_in_seconds'])
+        self.reboot_type = self.test_params['reboot_type']
+        if self.reboot_type not in ['fast-reboot', 'warm-reboot']:
+            raise ValueError('Not supported reboot_type %s' % self.reboot_type)
         self.dut_ssh = self.test_params['dut_username'] + '@' + self.test_params['dut_hostname']
         self.dut_mac = self.test_params['dut_mac']
         #
         self.generate_from_t1()
         self.generate_from_vlan()
+        self.generate_ping_dut_vlan_intf()
 
         self.log("Test params:")
         self.log("DUT ssh: %s" % self.dut_ssh)
-        self.log("DUT fast-reboot limit: %s" % self.limit)
+        self.log("DUT reboot limit in seconds: %s" % self.limit)
         self.log("DUT mac address: %s" % self.dut_mac)
 
         self.log("From server src addr: %s" % self.from_server_src_addr)
@@ -607,6 +614,24 @@ class FastReloadTest(BaseTest):
 
         return
 
+    def generate_ping_dut_vlan_intf(self):
+        packet = simple_icmp_packet(eth_dst=self.dut_mac,
+                                    ip_src=self.from_server_src_addr,
+                                    ip_dst=self.test_params['dut_vlan_ip'])
+
+        exp_packet = simple_icmp_packet(eth_src=self.dut_mac,
+                                        ip_src=self.test_params['dut_vlan_ip'],
+                                        ip_dst=self.from_server_src_addr,
+                                        icmp_type='echo-reply')
+
+
+        self.ping_dut_exp_packet  = Mask(exp_packet)
+        self.ping_dut_exp_packet.set_do_not_care_scapy(scapy.Ether, "dst")
+        self.ping_dut_exp_packet.set_do_not_care_scapy(scapy.IP, "id")
+        self.ping_dut_exp_packet.set_do_not_care_scapy(scapy.IP, "chksum")
+
+        self.ping_dut_packet = str(packet)
+
     def runTest(self):
         self.reboot_start = None
         no_routing_start = None
@@ -637,6 +662,17 @@ class FastReloadTest(BaseTest):
 
         self.log("Schedule to reboot the remote switch in %s sec" % self.reboot_delay)
         thr.start()
+
+        self.log("Wait until DUT reboots")
+        self.timeout(self.task_timeout, "DUT hasn't rebooted in %d seconds" % self.task_timeout)
+        self.wait_until_dut_reboots()
+        self.cancel_timeout()
+
+        self.reboot_start = datetime.datetime.now()
+        self.log("Dut reboots: reboot start %s" % str(self.reboot_start))
+
+        self.log("Check that device is still forwarding Data plane traffic")
+        self.assertTrue(self.check_alive(), 'DUT is not stable')
 
         self.log("Wait until ASIC stops")
         self.timeout(self.task_timeout, "DUT hasn't stopped in %d seconds" % self.task_timeout)
@@ -671,7 +707,7 @@ class FastReloadTest(BaseTest):
         self.fails['dut'] = set()
         if no_routing_stop - no_routing_start > self.limit:
             self.fails['dut'].add("Downtime must be less then %s seconds. It was %s" \
-                    % (self.test_params['fast_reboot_limit'], str(no_routing_stop - no_routing_start)))
+                    % (self.test_params['reboot_limit_in_seconds'], str(no_routing_stop - no_routing_start)))
         if no_routing_stop - self.reboot_start > datetime.timedelta(seconds=self.test_params['graceful_limit']):
             self.fails['dut'].add("Fast-reboot cycle must be less than graceful limit %s seconds" % self.test_params['graceful_limit'])
         if no_cp_replies < 0.95 * self.nr_vl_pkts:
@@ -755,13 +791,12 @@ class FastReloadTest(BaseTest):
         time.sleep(self.reboot_delay)
 
         self.log("Rebooting remote side")
-        self.reboot_start = datetime.datetime.now()
-        stdout, stderr, return_code = self.cmd(["ssh", "-oStrictHostKeyChecking=no", self.dut_ssh, "sudo fast-reboot"])
+        stdout, stderr, return_code = self.cmd(["ssh", "-oStrictHostKeyChecking=no", self.dut_ssh, "sudo " + self.reboot_type])
         if stdout != []:
-            self.log("stdout from fast-reboot: %s" % str(stdout))
+            self.log("stdout from %s: %s" % (self.reboot_type, str(stdout)))
         if stderr != []:
-            self.log("stderr from fast-reboot: %s" % str(stderr))
-        self.log("return code from fast-reboot: %s" % str(return_code))
+            self.log("stderr from %s: %s" % (self.reboot_type, str(stderr)))
+        self.log("return code from %s: %s" % (self.reboot_type, str(return_code)))
 
         return
 
@@ -778,6 +813,13 @@ class FastReloadTest(BaseTest):
     def peer_state_check(self, ip, queue):
         ssh = Arista(ip, queue, self.test_params)
         self.fails[ip], self.info[ip], self.cli_info[ip], self.logs_info[ip] = ssh.run()
+
+    def wait_until_dut_reboots(self):
+        while True:
+            total_rcv_pkt_cnt = self.pingDut()
+            if total_rcv_pkt_cnt < self.ping_dut_pkts:
+                break
+
 
     def check_forwarding_stop(self):
         return self.iteration(True)
@@ -874,3 +916,12 @@ class FastReloadTest(BaseTest):
 
         return total_rcv_pkt_cnt
 
+    def pingDut(self):
+        for i in xrange(self.ping_dut_pkts):
+            testutils.send_packet(self, self.random_port(self.vlan_ports), self.ping_dut_packet)
+
+        total_rcv_pkt_cnt = testutils.count_matched_packets_all_ports(self, self.ping_dut_exp_packet, self.vlan_ports, timeout=self.TIMEOUT)
+
+        self.log("Send %5d Received %5d ping DUT" % (self.ping_dut_pkts, total_rcv_pkt_cnt), True)
+
+        return total_rcv_pkt_cnt
