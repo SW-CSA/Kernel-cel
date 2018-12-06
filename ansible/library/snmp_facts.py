@@ -735,40 +735,40 @@ def main():
             current_oid = oid.prettyPrint()
             current_val = val.prettyPrint()
             if v.lldpRemTimeMark in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemTimeMark'] = current_val
             if v.lldpRemLocalPortNum in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemLocalPortNum'] = current_val
             if v.lldpRemIndex in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemIndex'] = current_val
             if v.lldpRemChassisIdSubtype in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemChassisIdSubtype'] = current_val
             if v.lldpRemChassisId in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemChassisId'] = current_val
             if v.lldpRemPortIdSubtype in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemPortIdSubtype'] = current_val
             if v.lldpRemPortId in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemPortId'] = current_val
             if v.lldpRemPortDesc in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemPortDesc'] = current_val
             if v.lldpRemSysName in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemSysName'] = current_val
             if v.lldpRemSysDesc in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemSysDesc'] = current_val
             if v.lldpRemSysCapSupported in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemSysCapSupported'] = current_val
             if v.lldpRemSysCapEnabled in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 results['snmp_interfaces'][ifIndex]['lldpRemSysCapEnabled'] = current_val
 
     errorIndication, errorStatus, errorIndex, varTable = cmdGen.nextCmd(
@@ -789,23 +789,23 @@ def main():
             current_oid = oid.prettyPrint()
             current_val = val.prettyPrint()
             if v.lldpRemManAddrSubtype in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 address = '.'.join(current_oid.split('.')[16:])
                 results['snmp_interfaces'][ifIndex]['lldpRemManAddrSubtype'] = current_val
             if v.lldpRemManAddr in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 address = '.'.join(current_oid.split('.')[16:])
                 results['snmp_interfaces'][ifIndex]['lldpRemManAddr'] = current_val
             if v.lldpRemManAddrIfSubtype in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 address = '.'.join(current_oid.split('.')[16:])
                 results['snmp_interfaces'][ifIndex]['lldpRemManAddrIfSubtype'] = current_val
             if v.lldpRemManAddrIfId in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 address = '.'.join(current_oid.split('.')[16:])
                 results['snmp_interfaces'][ifIndex]['lldpRemManAddrIfId'] = current_val
             if v.lldpRemManAddrOID in current_oid:
-                ifIndex = int(current_oid.split('.')[12])
+                ifIndex = int(current_oid.rsplit('.', 1)[-1])
                 address = '.'.join(current_oid.split('.')[16:])
                 results['snmp_interfaces'][ifIndex]['lldpRemManAddrOID'] = current_val
 
