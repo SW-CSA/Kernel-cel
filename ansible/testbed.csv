@@ -13,4 +13,3 @@ cel_slx_t0,ptf2,t0,docker-ptf,10.251.0.110/24,server_2,VM0300,cel-seastone-01,Te
 cel_slx_t1,ptf2,t1,docker-ptf,10.251.0.110/24,server_2,VM0400,cel-seastone-01,Tests ptf
 cel_e1031_t0,ptf1,t0,docker-ptf,10.250.0.110/24,server_1,VM0100,cel-e1031-01,Tests ptf
 cel_e1031_t1,ptf1,t1,docker-ptf,10.250.0.110/24,server_1,VM0200,cel-e1031-01,Tests ptf
-
