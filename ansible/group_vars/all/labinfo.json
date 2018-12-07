@@ -8,7 +8,8 @@
         "Arista-VM": "Arista",
         "Nexus-3064-NX": "Nexus",
         "Force10-S6100": "Force10",
-        "Force10-S6000": "Force10"
+        "Force10-S6000": "Force10",
+        "Celestica-E1031-T48S4": "Sonic"
     },
     "switch_login": {
         "Nexus": { 
@@ -20,6 +21,10 @@
             "user": "admin",
             "passwd": ["root","password", "123456"],
             "enable": ['', null]
+        },
+        "Sonic": {
+            "user": "admin",
+            "passwd": ["password"]
         },
         "Force10": {
             "user": "admin",
