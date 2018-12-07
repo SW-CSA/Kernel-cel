@@ -45,7 +45,7 @@
 - set_fact: ipv4=true
   when: ipv4 is not defined
 
-- set_fact: ipv6=true
+- set_fact: ipv6=false
   when: ipv6 is not defined
 
 - name: "Start PTF runner"
