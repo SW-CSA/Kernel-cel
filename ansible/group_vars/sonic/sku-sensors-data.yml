@@ -2028,5 +2028,3 @@ sensors_checks:
       temp: []
 
     psu_skips: {}
-
-
