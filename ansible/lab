@@ -25,14 +25,32 @@ lab-a7260-01      ansible_host=10.251.0.191    hwsku="Arista-7260CX3-D108C8"
 [sonic_a7260:vars]
 iface_speed='100000'
 
+[sonic_slx]
+cel-seastone-01    ansible_host=10.251.0.100  hwsku="Celestica-DX010-C32"
+
+[sonic_slx:vars]
+iface_speed='100000'
+mgmt_subnet_mask_length="24"
+
+[sonic_e1031]
+cel-e1031-01    ansible_host=10.250.0.100  hwsku="Celestica-E1031-T48S4"
+ 
+[sonic_e1031:vars]
+iface_speed='1000'
+mgmt_subnet_mask_length="24"
+
 [sonic:children]
 sonic_sn2700_40
 sonic_s6000
 sonic_s6100
 sonic_a7260
+sonic_slx
+sonic_e1031
 
 [ptf]
-ptf_ptf1    ansible_host=10.255.0.188 ansible_ssh_user=root ansible_ssh_pass=root
+ptf_ptf1    ansible_host=10.250.0.110 ansible_ssh_user=root ansible_ssh_pass=root
+ptf_ptf2    ansible_host=10.251.0.110 ansible_ssh_user=root ansible_ssh_pass=root
+
 ptf_vms1-1  ansible_host=10.255.0.178 ansible_ssh_user=root ansible_ssh_pass=root
 
 [lab:children]
@@ -46,3 +64,5 @@ mgmt_subnet_mask_length="24"
 str-7260-10       ansible_host=10.251.0.13
 str-7260-11       ansible_host=10.251.0.234
 str-msn2700-02    ansible_host=10.251.0.235 os=sonic
+e1031-fanout      ansible_host=10.250.0.235 os=sonic ansible_ssh_user=admin ansible_ssh_pass=password hwsku="Celestica-E1031-T48S4" 
+seastone-fanout      ansible_host=10.251.0.235 os=sonic ansible_ssh_user=admin ansible_ssh_pass=password hwsku="Celestica-DX010-C32" 

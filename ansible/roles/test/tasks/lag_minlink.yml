@@ -8,8 +8,8 @@
     - name: Shut down neighbor interface {{ neighbor_interface }} on {{ peer_device }}
       action: apswitch template=neighbor_interface_shut_single.j2
       args:
-        host: "{{peer_host}}"
-        login: "{{switch_login[hwsku_map[peer_hwsku]]}}"
+         host: "{{peer_host}}"
+         login: "{{switch_login[hwsku_map[peer_hwsku]]}}"
       connection: switch
     
     - pause:
@@ -21,6 +21,7 @@
       assert: { that: "'{{ lag_facts.lags[po]['po_stats']['ports'][item]['runner']['selected'] }}' == 'True'" }
       with_items: "{{ po_interfaces.keys() }}"
       when: item != "{{ flap_intf }}"
+           
 
     - name: Verify {{ flap_intf}}  lag member interfaces are marked as deselected for the shutdown port
       assert: { that: "'{{ lag_facts.lags[po]['po_stats']['ports'][item]['runner']['selected'] }}' == 'False'" }
