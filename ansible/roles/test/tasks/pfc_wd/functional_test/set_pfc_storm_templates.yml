@@ -7,3 +7,8 @@
       pfc_wd_storm_template: pfc_storm_arista.j2
       pfc_wd_storm_stop_template: pfc_storm_stop_arista.j2
   when: peer_hwsku | search("Arista") or peer_hwsku | search("arista")
+
+- set_fact:
+      pfc_wd_storm_template: pfc_storm_sonic.j2
+      pfc_wd_storm_stop_template: pfc_storm_stop_sonic.j2
+  when: peer_hwsku | search("Celestica") or peer_hwsku | search("celestica")
