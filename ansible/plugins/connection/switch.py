@@ -82,12 +82,9 @@ class Connection(ConnectionBase):
             self._display.vvv("Try password %s..." % login_passwd[0:4], host=self.host)
             client.sendline(login_passwd)
             client.timeout = 60
-          #  i = client.expect(['>', '#', '[Pp]assword:', pexpect.EOF])
-          #  if i < 2:
             i = client.expect(['>', '#', '\$', '[Pp]assword:', pexpect.EOF])
             if i < 3:
                 break
-          #  elif i == 3:
             elif i == 4:
                 last_user = None
 
@@ -101,7 +98,6 @@ class Connection(ConnectionBase):
 
         # determine the sku
         client.sendline('show version')
-        # client.expect(['#', '>'])
         client.expect(['#', '>', '\$'])
 
         if 'Arista' in client.before:
