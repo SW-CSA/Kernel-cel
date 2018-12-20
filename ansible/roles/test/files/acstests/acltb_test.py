@@ -123,7 +123,7 @@ class AclTest(BaseTest):
         self.tests_total = 0
 
         print "\nPort to sent packets to: %d" % src_port
-        print "Destination IP: %s" % dst_ip_blocked
+        print "Destination IP: %s" % dst_ip
         print "Ports to expect packet from: ",
         pprint.pprint(dst_ports)
         print "Dst IP expected to be blocked: ", dst_ip_blocked
@@ -271,6 +271,37 @@ class AclTest(BaseTest):
         tests_passed += (0 if res else 1)
         print "Test #12 %s" % ("FAILED" if res else "PASSED")							
 
+        pkt0 = simple_udp_packet(
+                                eth_dst = self.router_mac,
+                                eth_src = self.dataplane.get_mac(0, 0),
+                                ip_src = "10.0.0.1",
+                                ip_dst = dst_ip,
+                                udp_sport = 1234,
+                                udp_dport = 80,
+                                ip_ttl = 64
+                                )
+        #exp_pkt = pkt.deepcopy()
+        exp_pkt0 = simple_udp_packet(
+                                eth_dst = self.dataplane.get_mac(0, 0),
+                                eth_src = self.router_mac,
+                                ip_src = "10.0.0.1",
+                                ip_dst = dst_ip,
+                                udp_sport = 1234,
+                                udp_dport = 80,
+                                ip_ttl = 63
+                                )
+
+        # Test #13 - Verify source IP match - UDP packet and UDP protocol
+        pkt = pkt0.copy()
+        exp_pkt = exp_pkt0.copy()
+        pkt['IP'].src = "10.0.0.2"
+        exp_pkt['IP'].src = "10.0.0.2"
+        pkt['IP'].proto=0x11
+        exp_pkt['IP'].proto=0x11
+        res = self.runSendReceiveTest(pkt, src_port, exp_pkt, dst_ports)
+        tests_passed += (0 if res else 1)
+        print "Test #13 %s" % ("FAILED" if res else "PASSED")
+
         return tests_passed, self.tests_total
 
     #---------------------------------------------------------------------
@@ -283,7 +314,7 @@ class AclTest(BaseTest):
         test_result = False
 
         self.switch_info = open(self.test_params["switch_info"], 'r').readlines()
-        if self.testbed_type in [ 't1', 't1-lag' ]:
+        if self.testbed_type in [ 't1', 't1-lag', 't1-64-lag' ]:
             self.tor_ports = map(int, self.switch_info[0].rstrip(",\n").split(","))
             self.spine_ports = map(int, self.switch_info[1].rstrip(",\n").split(","))
             self.dest_ip_addr_spine = self.switch_info[2].strip()

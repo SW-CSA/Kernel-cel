@@ -9,3 +9,16 @@
   delegate_to: "{{peer_mgmt}}"
   become: true
   when: peer_hwsku | search("Arista") or peer_hwsku | search("arista")
+
+
+- name: Create pfc generater file in case it doesn't exist.
+  file: path=/tmp/{{pfc_gen_file}} state=touch
+  delegate_to: "{{peer_mgmt}}"
+  become: true
+  when: peer_hwsku | search("Celestica") or peer_hwsku | search("celestica")
+
+- name: Deploy PFC generator to the fanout switch
+  copy: src=roles/test/files/helpers/{{pfc_gen_file}} dest=/tmp
+  delegate_to: "{{peer_mgmt}}"
+  become: true
+  when: peer_hwsku | search("Celestica") or peer_hwsku | search("celestica")
