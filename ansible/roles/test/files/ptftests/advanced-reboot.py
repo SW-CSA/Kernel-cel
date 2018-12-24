@@ -879,7 +879,7 @@ class ReloadTest(BaseTest):
     def wait_until_vlan_cpu_port_up(self):
         while True:
             total_rcv_pkt_cnt = self.pingDut()
-            if total_rcv_pkt_cnt >= self.ping_dut_pkts / 2:
+            if total_rcv_pkt_cnt >= self.ping_dut_pkts / 16:
                 break
 
     def check_forwarding_stop(self):
