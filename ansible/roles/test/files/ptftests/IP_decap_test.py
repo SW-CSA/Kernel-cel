@@ -94,7 +94,8 @@ class DecapPacketTest(BaseTest):
         if self.test_params['testbed_type'] == 't1-64-lag':
             self.src_ports = [0, 1, 4, 5, 16, 17, 20, 21, 34, 36, 37, 38, 39, 42, 44, 45, 46, 47, 50, 52, 53, 54, 55, 58, 60, 61, 62, 63]
         if self.test_params['testbed_type'] == 't0':
-            self.src_ports = range(1, 25) + range(28, 32)
+            #self.src_ports = range(1, 25) + range(28, 32)
+            self.src_ports = range(3, 6, 2) + range(28, 32)  # just test 2 port
         if self.test_params['testbed_type'] == 't0-64':
             self.src_ports = [0,  1,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 36, 37, 38, 39, 40, 41, 42, 48, 52, 53, 54, 55, 56, 57, 58]
         if self.test_params['testbed_type'] == 't0-116':
@@ -342,6 +343,7 @@ class DecapPacketTest(BaseTest):
         expect the packet to be received from one of the expected ports
         """
 
+
         if inner_pkt_type == 'ipv4':
             ip_ranges = self.fib.ipv4_ranges()
         elif inner_pkt_type == 'ipv6':
@@ -350,6 +352,7 @@ class DecapPacketTest(BaseTest):
             raise Exception('ERROR: Invalid inner packet type passed: ', inner_pkt_type)
 
         for ip_range in ip_ranges:
+
             # Get the expected list of ports that would receive the packets
             exp_port_list = self.fib[ip_range.get_first_ip()].get_next_hop_list()
             # Choose random one source port from all ports excluding the expected ones

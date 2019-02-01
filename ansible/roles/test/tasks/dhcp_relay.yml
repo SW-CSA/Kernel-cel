@@ -47,3 +47,4 @@
       - relay_iface_mac=\"{{ relay_iface_mac }}\"
       - relay_iface_netmask=\"{{ minigraph_vlan_interfaces[0]['mask'] }}\"
     ptf_extra_options: "--relax"
+

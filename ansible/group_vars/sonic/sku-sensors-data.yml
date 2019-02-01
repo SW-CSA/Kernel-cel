@@ -1664,6 +1664,7 @@ sensors_checks:
       - dx010_lm75b-i2c-7-4a/ASIC temp sensor/temp1_input
     psu_skips: {}
 
+
   Arista-7170-64C:
     alarms:
       fan: 
@@ -1739,3 +1740,29 @@ sensors_checks:
       temp: []
 
     psu_skips: {}
+
+  Celestica-E1031-T48S4:
+    alarms:
+      fan: []
+      power: []
+      temp:
+      - coretemp-isa-0000/Core 0/temp2_crit_alarm
+      - coretemp-isa-0000/Core 1/temp3_crit_alarm
+    compares:
+      fan: []
+      power: []
+      temp:
+      - - coretemp-isa-0000/Core 0/temp2_input
+        - coretemp-isa-0000/Core 0/temp2_crit
+      - - coretemp-isa-0000/Core 0/temp2_input
+        - coretemp-isa-0000/Core 0/temp2_max
+      - - coretemp-isa-0000/Core 1/temp3_input
+        - coretemp-isa-0000/Core 1/temp3_crit
+      - - coretemp-isa-0000/Core 1/temp3_input
+        - coretemp-isa-0000/Core 1/temp3_max
+    non_zero:
+      fan: []
+      power: []
+      temp: []
+    psu_skips: {}
+

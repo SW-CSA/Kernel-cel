@@ -105,7 +105,9 @@ function add_topo
 
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_add_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" $@
 
+
   ansible-playbook fanout_connect.yml -i $vmfile --limit "$server" --vault-password-file="${passwd}" -e "dut=$dut" $@
+
 
   echo Done
 }
@@ -152,7 +154,9 @@ function refresh_dut
 
   read_file ${topology}
 
+
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_refresh_dut.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" $@
+
 
   echo Done
 }
@@ -230,7 +234,9 @@ function connect_topo
 
   read_file $1
 
+
   ansible-playbook fanout_connect.yml -i $vmfile --limit "$server" --vault-password-file="$2" -e "dut=$dut"
+
 }
 
 vmfile=veos
