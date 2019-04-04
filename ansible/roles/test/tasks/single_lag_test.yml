@@ -20,28 +20,26 @@
 - set_fact:
     peer_device: "{{ fanout_neighbors[flap_intf]['peerdevice'] }}"
     neighbor_interface: "{{ fanout_neighbors[flap_intf]['peerport'] }}"
-  ignore_errors: yes  #bbx ignore fanout
 
 - conn_graph_facts: host={{ peer_device }}
   connection: local
-  ignore_errors: yes  #bbx ignore fanout
 
 - set_fact:
     peer_host: "{{ device_info['mgmtip'] }}"
     peer_hwsku: "{{ device_info['HwSku'] }}"
-  ignore_errors: yes  #bbx ignore fanout
+    peer_type: "{{ device_info['Type']}}"     # added by Vincent Meng
 
 - name: test fanout interface (physical) flap and lacp keep correct po status follow minimum links requirement
   include: lag_minlink.yml
   vars:
     wait_down_time: 20
-  ignore_errors: yes  #bbx ignore fanout
 
 ### Now figure out remote VM and interface info for the falpping lag member and run minlink test 
 - set_fact:
     peer_device: "{{vm_neighbors[flap_intf]['name']}}"
     neighbor_interface: "{{vm_neighbors[flap_intf]['port']}}"
     peer_hwsku: 'Arista-VM'
+    peer_type: 'Arista'         # added by Vincent Meng
 
 - set_fact:
     peer_host: "{{ minigraph_devices[peer_device]['mgmt_addr'] }}"

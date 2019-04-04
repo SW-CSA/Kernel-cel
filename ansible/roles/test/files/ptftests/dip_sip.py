@@ -185,7 +185,7 @@ class DipSipTest(BaseTest):
     #--------------------------------------------------------------------------
 
     def runTest(self):
-        if self.testbed_type in ['t0', 't0-16', 't0-56', 't0-64', 't0-64-32', 't0-116', 't1', 't1-lag', 't1-64-lag']:
+        if self.testbed_type in ['t0', 't0-16', 't0-56', 't0-64', 't0-64-32', 't0-116', 't0-slx', 't0-e1031', 't1', 't1-lag', 't1-64-lag', 't1-slx']:
             self.log("Run PORT/LAG-router based test")
 
             test = PortLagRouterBasedTest(self)

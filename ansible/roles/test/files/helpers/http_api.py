@@ -12,5 +12,5 @@ def run_command():
     return 'OK\n'
 
 if __name__ == '__main__':
-    app.run(port=sys.argv[1])
+    app.run(port=int(sys.argv[1]))
 

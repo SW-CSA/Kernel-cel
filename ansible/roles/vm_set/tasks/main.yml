@@ -56,7 +56,7 @@
 
 - name: Install necessary packages
   apt: pkg={{ item }} update_cache=yes cache_valid_time=86400
-  become: no
+  become: yes
   with_items:
     - qemu
     - openvswitch-switch
@@ -73,8 +73,8 @@
     - curl
     - software-properties-common
     - docker-ce
+  when: allow_install is defined
   ignore_errors: true
-
 
 - include: docker.yml
 

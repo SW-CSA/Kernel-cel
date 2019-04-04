@@ -11,6 +11,7 @@
         "Nexus-3064-NX": "Nexus",
         "Force10-S6100": "Force10",
         "Force10-S6000": "Force10",
+        "Celestica-DX010-C32": "Sonic",
         "Celestica-E1031-T48S4": "Sonic"
     },
     "switch_login": {
@@ -24,14 +25,15 @@
             "passwd": ["root","password", "123456"],
             "enable": ['', null]
         },
-        "Sonic": {
-            "user": "admin",
-            "passwd": ["password"]
-        },
         "Force10": {
             "user": "admin",
             "passwd": ["password"],
             "enable": ["password"] 
+        },
+        "Sonic": {
+            "user": "admin",
+            "passwd": ["root","password","123456"],
+            "enable": ['',null]
         }
     }
 }

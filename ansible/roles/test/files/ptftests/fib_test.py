@@ -96,15 +96,20 @@ class FibTest(BaseTest):
 
         if self.test_params['testbed_type'] == 't1' or self.test_params['testbed_type'] == 't1-lag':
             self.src_ports = range(0, 32)
+        if self.test_params['testbed_type'] == 't1-slx':
+            self.src_ports = range(0, 31)
         if self.test_params['testbed_type'] == 't1-64-lag':
             self.src_ports = [0, 1, 4, 5, 16, 17, 20, 21, 34, 36, 37, 38, 39, 42, 44, 45, 46, 47, 50, 52, 53, 54, 55, 58, 60, 61, 62, 63]
         if self.test_params['testbed_type'] == 't0':
-            #self.src_ports = range(1, 25) + range(28, 32)
-            self.src_ports = range(3, 6, 2) + range(28, 32) # just test port3,5, ignore other unstable port.
+            self.src_ports = range(1, 25) + range(28, 32)
         if self.test_params['testbed_type'] == 't0-64':
             self.src_ports = range(0, 2) + range(4, 18) + range(20, 33) + range(36, 43) + range(48, 49) + range(52, 59)
         if self.test_params['testbed_type'] == 't0-116':
             self.src_ports = range(0, 120)
+        if self.test_params['testbed_type'] == 't0-slx':
+            self.src_ports = range(1, 25) + range(27, 31)
+        if self.test_params['testbed_type'] == 't0-e1031':
+            self.src_ports = range(3, 6, 2) + range(28, 32)
     #---------------------------------------------------------------------
 
     def check_ip_range(self, ipv4=True):
@@ -114,32 +119,6 @@ class FibTest(BaseTest):
             ip_ranges = self.fib.ipv6_ranges()
 
         for ip_range in ip_ranges:
-
-################## add start for ignore unused routes    ##############################
-            logging.info("Check IP first address: " + str(ip_range.get_first_ip()) + " length: " \
-			+ str(ip_range.length()) + " " + str(ip_range.get_last_ip()))
-	    if ip_range.get_first_ip() == '0.0.0.0':
-		continue
-	    if ip_range.get_first_ip() == '1.0.0.0':
-		continue
-	    if ip_range.get_first_ip() == '2.0.0.0':
-		continue
-	    if ip_range.get_first_ip() == '10.0.0.0':
-		continue
-	    if ip_range.get_first_ip() == '11.0.0.0':
-		continue
-	    if ip_range.get_first_ip() == '127.0.0.0':
-		continue
-	    if ip_range.get_first_ip() == '128.0.0.0':
-		continue
-	    if ip_range.get_first_ip() == '169.254.0.0':
-		continue
-	    if ip_range.get_first_ip() == '169.255.0.0':
-		continue
-	    if ip_range.length() > 64:
-		continue
-###################### add end ###############################################################
-
 
             # Get the expected list of ports that would receive the packets
             exp_port_list = self.fib[ip_range.get_first_ip()].get_next_hop_list()
