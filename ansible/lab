@@ -31,5 +31,5 @@ mgmt_subnet_mask_length="24"
 
 [fanout]
 seastone-fanout ansible_host=10.251.0.235 os=sonic ansible_ssh_user=admin ansible_ssh_pass=password
-e1031-fanout ansible_host=10.250.0.235 os=sonic ansible_ssh_user=admin ansible_ssh_pass=password hwsku="Celestica-E1031-T48S4" 
+e1031-fanout ansible_host=10.250.0.235 os=sonic ansible_ssh_user=admin ansible_ssh_pass=password 
 
