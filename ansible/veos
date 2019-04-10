@@ -107,14 +107,21 @@ host_var_file=host_vars/STR-ACS-SERV-01.yml
 [server_2:children]
 vm_host_2
 vms_3
-#vms_4
 
 [server_2:vars]
+host_var_file=host_vars/STR-ACS-SERV-02.yml
+
+[server_3:children]
+vm_host_2
+vms_4
+
+[server_3:vars]
 host_var_file=host_vars/STR-ACS-SERV-02.yml
 
 [servers:children]
 server_1
 server_2
+server_3
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't1-64-lag', 't0', 't0-16', 't0-56', 't0-52', 't0-slx', 't0-e1031', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']
