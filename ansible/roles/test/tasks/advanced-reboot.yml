@@ -42,13 +42,10 @@
         - arp_responder_args: '-e'
       delegate_to: "{{ ptf_host }}"
 
-    - name: Reread supervisor configuration
-      shell: supervisorctl reread
-      delegate_to: "{{ ptf_host }}"
-
     - name: Update supervisor configuration
-      shell: supervisorctl update
-      delegate_to: "{{ ptf_host }}"
+      include: "roles/test/tasks/common_tasks/update_supervisor.yml"
+      vars:
+        supervisor_host: "{{ ptf_host }}"
 
     - name: Remove old keys
       file:
@@ -106,15 +103,29 @@
         dest: /tmp/ports.json
       delegate_to: "{{ ptf_host }}"
 
+    - debug: msg="Defined new sonic image url is {{ new_sonic_image }}"
+      when: new_sonic_image is defined
+
+    - set_fact:
+        stay_in_target_image:     "{{ stay_in_target_image     | default('false') | bool }}"
+        cleanup_old_sonic_images: "{{ cleanup_old_sonic_images | default('false') | bool }}"
+
     - block:
 
         - name: Save image version
           shell: 'sonic_installer list | grep Current | cut -f2 -d " "'
           register: current_sonic_image
           become: true
+          when: not stay_in_target_image
+
+        - name: Generate temp file name on target device
+          shell: mktemp
+          register: tempfile
 
         - set_fact:
-            new_image_location: '/tmp/new_sonic_image.bin'
+            new_image_location: '{{ tempfile.stdout }}'
+
+        - debug: msg='Setting image file name to {{ new_image_location }}'
 
         - name: Download SONiC image.
           local_action: get_url url={{ new_sonic_image }} dest={{ new_image_location }}
@@ -124,14 +135,24 @@
             src: "{{ new_image_location }}"
             dest: "{{ new_image_location }}"
 
-        - name: Install a new SONiC image if requested
+        - name: Cleanup sonic images that is not current and/or next
+          shell: sonic_installer cleanup -y
+          become: true
+          when: cleanup_old_sonic_images
+
+        - name: 'Setup restoring initial image {{ current_sonic_image }}'
+          shell: /bin/true
+          connection: local
+          notify:
+          - restore current image
+          - reboot sonic
+          when: not stay_in_target_image
+
+        - name: Installing new SONiC image
           shell: sonic_installer install -y {{ new_image_location }}
           become: true
-          notify:
-            - restore current image
-            - reboot sonic
 
-      when: new_sonic_image is defined
+      when: new_sonic_image | default('') | length > 0
 
     - include: ptf_runner.yml
       vars:
@@ -145,7 +166,7 @@
         - verbose=False
         - dut_username=\"{{ ansible_ssh_user }}\"
         - dut_hostname=\"{{ ansible_host }}\"
-        - reboot_limit_in_seconds=30
+        - reboot_limit_in_seconds={{ reboot_limit }}
         - reboot_type=\"{{ reboot_type }}\"
         - portchannel_ports_file=\"/tmp/portchannel_interfaces.json\"
         - vlan_ports_file=\"/tmp/vlan_interfaces.json\"
@@ -158,9 +179,16 @@
         - arista_vms=\"['{{ vm_hosts | list | join("','") }}']\"
 
   always:
-    - name: Copy test results from ptf to the local box /tmp/reboot.log
-      fetch: src='/tmp/reboot.log' dest='/tmp/' flat=true fail_on_missing=false
+    - name: Copy test results from ptf to the local box /tmp/*-reboot.log
+      fetch: src='/tmp/{{reboot_type}}.log' dest='/tmp/' flat=true fail_on_missing=false
       delegate_to: "{{ ptf_host }}"
+
+    - name: Copy pcap files from ptf to the local box /tmp/
+      fetch: src={{ item }} dest='/tmp/' flat=true fail_on_missing=false
+      delegate_to: "{{ ptf_host }}"
+      with_items:
+        - "/tmp/capture.pcap"
+        - "/tmp/capture_filtered.pcap"
 
     - name: Remove existing ip from ptf host
       script: roles/test/files/helpers/remove_ip.sh
@@ -170,7 +198,7 @@
       extract_log:
         directory: '/var/log'
         file_prefix: 'syslog'
-        start_string: 'Initializing cgroup subsys cpuset'
+        start_string: 'Linux version'
         target_filename: '/tmp/syslog'
       become: yes
 

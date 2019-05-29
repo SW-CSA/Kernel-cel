@@ -13,11 +13,19 @@
     - name: Get NH IP 1
       command: ip -4 neigh show dev {{crm_intf}} nud reachable nud stale
       register: out
+
+    - fail: msg="Get Next Hop IP failed. Neighbour not found"
+      when: out.stdout == ""
+
     - set_fact: nh_ip1="{{out.stdout.split()[0]}}"
 
     - name: Get NH IP 2
       command: ip -4 neigh show dev {{crm_intf1}} nud reachable nud stale
       register: out
+
+    - fail: msg="Get Next Hop IP failed. Neighbour not found"
+      when: out.stdout == ""
+
     - set_fact: nh_ip2="{{out.stdout.split()[0]}}"
 
     - name: Add nexthop group members
@@ -41,7 +49,7 @@
       assert: {that: "{{new_crm_stats_nexthop_group_member_used|int - crm_stats_nexthop_group_member_used|int == 2}}"}
 
     - name: Verify "crm_stats_nexthop_group_member_available" counter was decremented
-      assert: {that: "{{crm_stats_nexthop_group_member_available|int - new_crm_stats_nexthop_group_member_available|int == 2}}"}
+      assert: {that: "{{crm_stats_nexthop_group_member_available|int - new_crm_stats_nexthop_group_member_available|int >= 2}}"}
 
     - name: Remove nexthop group members
       command: ip route del 2.2.2.0/24 nexthop via {{nh_ip1}} nexthop via {{nh_ip2}}
