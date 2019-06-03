@@ -19,12 +19,21 @@
        - sonic_hwsku in mellanox_hwskus
        - dscp_mode is not defined
 
+  - name: Set ttl_mode var
+    set_fact:
+      ttl_mode: pipe
+    when:
+      - ttl_mode is not defined
+
 - fail: msg="information about testbed missing."
   when: (testbed_type is not defined) or
         (dscp_mode is not defined) 
 
-- fail: msg="Invalid testbed_type value '{{dscp_mode}}'"
+- fail: msg="Invalid dscp_mode value '{{dscp_mode}}'"
   when: dscp_mode not in ['pipe','uniform']
+
+- fail: msg="Invalid ttl_mode value '{{ttl_mode}}'"
+  when: ttl_mode not in ['pipe','uniform']
 
 - include_vars: "vars/topo_{{testbed_type}}.yml"
 
@@ -56,12 +65,7 @@
   debug: msg="Loopback IPs {{ lo_ip }}, {{ lo_ipv6 }}"
 
 # Generate file with BGP routes information
-- template: src=roles/test/templates/fib.j2 dest=/tmp/fib_info.txt
-  connection: local
-
-# Copy the fib_info to ptf container
-- template: src=/tmp/fib_info.txt dest=/root
-  connection: local
+- template: src=roles/test/templates/fib.j2 dest=/root/fib_info.txt
   delegate_to: "{{ ptf_host }}"
 
 - set_fact: outer_ipv4=True
@@ -94,7 +98,7 @@
 
   # Separate set_fact is required to be able to use 'testname' fact.
   - set_fact:
-      testname_unique: "{{ testname }}.{{ ansible_date_time.date}}.{{ ansible_date_time.hour}}-{{ ansible_date_time.minute}}-{{ ansible_date_time.second}}"
+      testname_unique: "{{ testname }}.{{lookup('pipe','date +%Y-%m-%d-%H:%M:%S')}}"
 
   - debug: msg="generated run id:{{testname_unique}}"
 
@@ -115,8 +119,9 @@
       ptf_test_params:
         - testbed_type='{{ testbed_type }}'
         - fib_info='/root/fib_info.txt'
-        - router_mac='{{ansible_Ethernet0['macaddress']}}'
+        - router_mac='{{ ansible_interface_facts['Ethernet0']['macaddress'] }}'
         - dscp_mode='{{ dscp_mode }}'
+        - ttl_mode='{{ ttl_mode }}'
         - lo_ip='{{ lo_ip }}'
         - lo_ipv6='{{ lo_ipv6 }}'
         - outer_ipv4={{ outer_ipv4 }}

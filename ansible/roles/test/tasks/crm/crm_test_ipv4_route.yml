@@ -13,6 +13,10 @@
     - name: Get NH IP
       command: ip -4 neigh show dev {{crm_intf}} nud reachable nud stale
       register: out
+
+    - fail: msg="Get Next Hop IP failed. Neighbour not found"
+      when: out.stdout == ""
+
     - set_fact: nh_ip="{{out.stdout.split()[0]}}"
 
     - name: Add IPv4 route
@@ -20,7 +24,7 @@
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds=2
+      pause: seconds=3
 
     - name: Get new "crm_stats_ipv4_route_used" counter value
       command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_route_used
@@ -43,7 +47,7 @@
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds=2
+      pause: seconds=3
 
     - name: Get new "crm_stats_ipv4_route_used" counter value
       command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_route_used

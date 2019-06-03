@@ -15,7 +15,7 @@
   - name: build shell command string
     debug: msg="PORTS={{minigraph_ports.keys() | join(' ')}}; for port in $PORTS; do config interface startup $port; done"
 
-  - name: turn off all ports on device
+  - name: turn on all ports on device
     shell: PORTS="{{minigraph_ports.keys() | join(' ')}}"; for port in $PORTS; do config interface startup $port; done
     become: yes
 
