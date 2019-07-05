@@ -60,10 +60,10 @@
   when: item != "eth0"
 
 - block:
-  - name: Disable lldp from DUT
+  - name: Disable LLDP from DUT
     shell: "docker exec -i lldp lldpcli  configure lldp status disabled"
 
-  - name: Wait 120s to clear lldp info (TTL  120s)
+  - name: Wait 120s to clear LLDP info (TTL  120s)
     pause:
       seconds: 120
 
@@ -72,10 +72,10 @@
     register: lldptest
     failed_when: '"Ethernet" in lldptest.stdout'
 
-  - name: Enable lldp tx and rx
+  - name: Enable LLDP tx and rx
     shell: "docker exec -i lldp lldpcli  configure lldp status rx-and-tx"
 
-  - name: Wait 30s to get lldp info
+  - name: Wait 30s to get LLDP info
     pause:
       seconds: 30
 
@@ -95,7 +95,7 @@
     when: item != "eth0"
 
   rescue:
-    - name: Restart lldp if Failed
+    - name: Restart LLDP if Failed
       shell: "docker exec -i lldp lldpcli  configure lldp status rx-and-tx"
 
 
